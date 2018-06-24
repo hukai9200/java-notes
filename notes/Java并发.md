@@ -12,10 +12,11 @@
     - [Java线程的实现](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#Java线程的实现)
     - [线程调度](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#线程调度)
 - [线程状态](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#线程状态)
-    - [新建（New）](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#新建（New）)
-    - [就绪及运行（Runnable）](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#就绪及运行（Runnable）)
-    - [阻塞（Blocked）](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#阻塞（Blocked）)
-    - [终止（Terminated）](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#终止（Terminated）)
+    - [新建（New）](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#新建new)
+    - [就绪及运行（Runnable）](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#就绪及运行runnable)
+    - [阻塞（Blocked）](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#阻塞blocked)
+    - [终止（Terminated）](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#终止terminated)
+    - [Java线程状态转换](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#Java线程状态转换)
 
 # 线程与进程
 
