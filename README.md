@@ -9,6 +9,6 @@
 Java基础  
 
 Java并发  
-- [线程与进程](https://github.com/nekolr/java-notes/notes/Java并发.md#线程与进程)
+- [线程与进程](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#线程与进程)
 
 JVM  

@@ -1,10 +1,10 @@
-- [线程与进程](https://github.com/nekolr/java-notes/notes/Java并发.md#线程与进程)
-    - [程序](https://github.com/nekolr/java-notes/notes/Java并发.md#程序)
-    - [进程](https://github.com/nekolr/java-notes/notes/Java并发.md#进程)
-    - [线程](https://github.com/nekolr/java-notes/notes/Java并发.md#线程)
-    - [并发](https://github.com/nekolr/java-notes/notes/Java并发.md#并发)
-    - [并行](https://github.com/nekolr/java-notes/notes/Java并发.md#并行)
-    - [程序运行](https://github.com/nekolr/java-notes/notes/Java并发.md#程序运行)
+- [线程与进程](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#线程与进程)
+    - [程序](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#程序)
+    - [进程](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#进程)
+    - [线程](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#线程)
+    - [并发](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#并发)
+    - [并行](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#并行)
+    - [程序运行](https://github.com/nekolr/java-notes/blob/master/notes/Java并发.md#程序运行)
 
 # 线程与进程
 
