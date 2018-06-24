@@ -17,8 +17,7 @@
     - [阻塞（Blocked）](#阻塞blocked)
     - [终止（Terminated）](#终止terminated)
     - [Java 线程状态转换](#Java-线程状态转换)
-- 参考
-    - 《深入理解Java虚拟机:JVM高级特性与最佳实践》
+- [参考](#参考)
 
 # 线程与进程
 
@@ -194,3 +193,6 @@ public enum State {
 
 ![thread_state](https://github.com/nekolr/java-notes/blob/master/images/Java%20并发/G3d.png)
 
+# 参考
+
+> 《深入理解Java虚拟机:JVM高级特性与最佳实践》  
