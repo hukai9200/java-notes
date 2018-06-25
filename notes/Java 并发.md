@@ -862,9 +862,15 @@ public void append(String s1, String s2) {
 # 参考
 
 > 《深入理解Java虚拟机:JVM高级特性与最佳实践》  
-[Java 理论与实践 : 处理 InterruptedException](https://www.ibm.com/developerworks/cn/java/j-jtp05236.html)  
-[阮一峰：进程与线程的一个简单解释](http://www.ruanyifeng.com/blog/2013/04/processes_and_threads.html)  
-[David Dice: Implementing Fast Java Monitors with Relaxed-Locks](https://www.usenix.org/legacy/event/jvm01/full_papers/dice/dice.pdf)  
-[JVM内部细节之一：synchronized关键字及实现细节（轻量级锁Lightweight Locking）](http://www.cnblogs.com/javaminer/p/3889023.html)  
-[探索 Java 同步机制: Monitor Object 并发模式在 Java 同步机制中的实现](https://www.ibm.com/developerworks/cn/java/j-lo-synchronized/)  
-[关于synchronized的Monitor Object机制的研究](https://blog.csdn.net/m_xiaoer/article/details/73274642)
+
+> [Java 理论与实践 : 处理 InterruptedException](https://www.ibm.com/developerworks/cn/java/j-jtp05236.html)  
+
+> [阮一峰：进程与线程的一个简单解释](http://www.ruanyifeng.com/blog/2013/04/processes_and_threads.html)  
+
+> [David Dice: Implementing Fast Java Monitors with Relaxed-Locks](https://www.usenix.org/legacy/event/jvm01/full_papers/dice/dice.pdf)  
+
+> [JVM内部细节之一：synchronized关键字及实现细节（轻量级锁Lightweight Locking）](http://www.cnblogs.com/javaminer/p/3889023.html)  
+
+> [探索 Java 同步机制: Monitor Object 并发模式在 Java 同步机制中的实现](https://www.ibm.com/developerworks/cn/java/j-lo-synchronized/)  
+
+> [关于synchronized的Monitor Object机制的研究](https://blog.csdn.net/m_xiaoer/article/details/73274642)
