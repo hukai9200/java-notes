@@ -20,6 +20,12 @@ Java 并发
     - LockSupport 工具类
     - 深入 AbstractQueuedSynchronizer
     - 深入 ReentrantLock
+- [选择 synchronized 还是 ReentrantLock](https://github.com/nekolr/java-notes/blob/master/notes/选择%20synchronized%20还是%20ReentrantLock.md)
+- 深入线程池
+- 并发集合类
+- Fork/Join 框架
+- atomic 包
+- 其他并发组件
 
 Java 虚拟机  
 
