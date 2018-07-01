@@ -15,9 +15,9 @@ Java 并发
 - [线程控制与线程通信基础](https://github.com/nekolr/java-notes/blob/master/notes/线程控制与线程通信基础.md#线程控制与线程通信基础)
 - [线程安全与线程安全的实现](https://github.com/nekolr/java-notes/blob/master/notes/线程安全与线程安全的实现.md#线程安全与线程安全的实现)
 - [深入 synchronized](https://github.com/nekolr/java-notes/blob/master/notes/深入%20synchronized.md#深入-synchronized)
-- 深入 Lock
-    - Lock 接口
-    - LockSupport 工具类
+- [深入 Lock](https://github.com/nekolr/java-notes/blob/master/notes/深入%20Lock.md#深入-lock)
+    - [Lock 接口](https://github.com/nekolr/java-notes/blob/master/notes/深入%20Lock.md#lock-接口)
+    - [LockSupport 工具类](https://github.com/nekolr/java-notes/blob/master/notes/深入%20Lock.md#locksupport-工具类)
     - 深入 AbstractQueuedSynchronizer
     - 深入 ReentrantLock
 - [选择 synchronized 还是 ReentrantLock](https://github.com/nekolr/java-notes/blob/master/notes/选择%20synchronized%20还是%20ReentrantLock.md)

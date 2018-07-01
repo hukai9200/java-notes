@@ -1,5 +1,5 @@
 # 选择 synchronized 还是 ReentrantLock
-`ReentrantLock` 与 `synchronized`相比有更多新的特性，并且性能也很高，我们是不是要使用它替换掉 `synchronized` 呢？答案是否。我们可以先看一下使用 `ReentrantLock` 会有哪些问题：  
+`ReentrantLock` 与 `synchronized`相比有更多新的特性，并且性能也很高，我们是不是要使用它替换掉 `synchronized` 呢？答案是没必要。我们可以先看一下使用 `ReentrantLock` 会有哪些问题：  
 
 - `ReentrantLock` 并没有进行类似 `synchronized` 的锁优化。
 - 手动释放锁很容易被遗忘，这在测试时可能没有问题，但是在实际工作中就会出现死锁，并且很难找到原因。  
