@@ -6,6 +6,7 @@
         - [tryLock](#trylock)
         - [unlock](#unlock)
         - [newCondition](#newcondition)
+        - [Lock 接口的使用方式](#lock-接口的使用方式)
     - [LockSupport（JDK 1.8）](#locksupportjdk-18)
         - [几个关键属性](#几个关键属性)
         - [许可](#许可)
