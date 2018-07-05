@@ -18,7 +18,7 @@ Java 并发
 - [深入 Lock](https://github.com/nekolr/java-notes/blob/master/notes/深入%20Lock.md#深入-lock)
     - [Lock 接口](https://github.com/nekolr/java-notes/blob/master/notes/深入%20Lock.md#lock-接口)
     - [LockSupport 工具类](https://github.com/nekolr/java-notes/blob/master/notes/深入%20Lock.md#locksupportjdk-18)
-    - 深入 AbstractQueuedSynchronizer
+    - [深入 AbstractQueuedSynchronizer](https://github.com/nekolr/java-notes/blob/master/notes/深入%20Lock.md#深入-abstractqueuedsynchronizerjdk-18)
     - 深入 ReentrantLock
 - [选择 synchronized 还是 ReentrantLock](https://github.com/nekolr/java-notes/blob/master/notes/选择%20synchronized%20还是%20ReentrantLock.md)
 - 深入 ThreadLocal
