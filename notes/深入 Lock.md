@@ -1,5 +1,9 @@
 
 - [synchronized 的缺陷](#synchronized-的缺陷)
+
+<details>
+<summary>Lock 接口</summary>
+
 - [Lock 接口](#lock-接口)
     - [lock](#lock)
     - [lockInterruptibly](#lockinterruptibly)
@@ -8,6 +12,7 @@
     - [newCondition](#newcondition)
     - [Lock 接口的使用方式](#lock-接口的使用方式)
 
+</details>
 <details>
 <summary>LockSupport（JDK 1.8）</summary>
 
