@@ -1,6 +1,10 @@
 
+<details>
+<summary>synchronized 的缺陷</summary>
+
 - [synchronized 的缺陷](#synchronized-的缺陷)
 
+</details>
 <details>
 <summary>Lock 接口</summary>
 
