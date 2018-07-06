@@ -128,7 +128,7 @@ monitor record 是线程私有的数据结构，每一个线程都有一个可�
 ![monitor record](https://github.com/nekolr/java-notes/blob/master/images/Java%20并发/q6b.png)
 
 - Owner  
-初始时为 NULL，标识当前没有任何线程拥有该 monitor record，当线程成功拥有该锁后，保存线程唯一标识，所释放时重新设置为 NULL。  
+初始时为 NULL，标识当前没有任何线程拥有该 monitor record，当线程成功拥有该锁后，保存线程唯一标识，锁释放时重新设置为 NULL。  
 - EntryQ  
 关联一个系统互斥锁（semaphore），阻塞所有竞争该锁失败的线程。  
 - RcThis  
