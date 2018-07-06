@@ -1,49 +1,60 @@
-- [深入 Lock](#深入-lock)
-    - [synchronized 的缺陷](#synchronized-的缺陷)
-    - [Lock 接口](#lock-接口)
-        - [lock](#lock)
-        - [lockInterruptibly](#lockinterruptibly)
-        - [tryLock](#trylock)
-        - [unlock](#unlock)
-        - [newCondition](#newcondition)
-        - [Lock 接口的使用方式](#lock-接口的使用方式)
-    - [LockSupport（JDK 1.8）](#locksupportjdk-18)
-        - [几个关键属性](#几个关键属性)
-        - [许可](#许可)
-        - [几个重要的方法](#几个重要的方法)
-            - [setBlocker() 和 getBlocker()](#setblocker-和-getblocker)
-            - [park()](#park)
-            - [unpark()](#unpark)
-            - [LockSupport 的特性](#locksupport-的特性)
-    - [深入 AbstractQueuedSynchronizer（JDK 1.8）](#深入-abstractqueuedsynchronizerjdk-18)
-        - [几个重要属性](#几个重要属性)
-        - [Node](#node)
-        - [同步队列](#同步队列)
-            - [入队列](#入队列)
-            - [出队列](#出队列)
-        - [状态](#状态)
-        - [独占模式](#独占模式)
-            - [独占式获取锁](#独占式获取锁)
-                - [独占式不响应中断获取锁](#独占式不响应中断获取锁)
-                - [独占式响应中断获取锁](#独占式响应中断获取锁)
-                - [独占式响应中断和超时获取锁](#独占式响应中断和超时获取锁)
-            - [独占式释放锁](#独占式释放锁)
-        - [共享模式](#共享模式)
-            - [共享式获取锁](#共享式获取锁)
-                - [共享式不响应中断获取锁](#共享式不响应中断获取锁)
-                - [共享式响应中断获取锁](#共享式响应中断获取锁)
-                - [共享式响应中断和超时获取锁](#共享式响应中断和超时获取锁)
-            - [共享式释放锁](#共享式释放锁)
-        - [Condition](#condition)
-            - [Condition 接口](condition-接口)
-            - [ConditionObject](#conditionobject)
-                - [入队、出队操作](#入队出队操作)
-                - [awaitUninterruptibly](#awaituninterruptibly)
-                - [await](#await)
-                - [awaitNanos](#awaitnanos)
-                - [awaitUntil](#awaituntil)
-                - [signal](#signal)
-                - [signalAll](#signalall)
+
+- [synchronized 的缺陷](#synchronized-的缺陷)
+- [Lock 接口](#lock-接口)
+    - [lock](#lock)
+    - [lockInterruptibly](#lockinterruptibly)
+    - [tryLock](#trylock)
+    - [unlock](#unlock)
+    - [newCondition](#newcondition)
+    - [Lock 接口的使用方式](#lock-接口的使用方式)
+
+<details>
+<summary>LockSupport（JDK 1.8）</summary>
+
+- [LockSupport（JDK 1.8）](#locksupportjdk-18)
+    - [几个关键属性](#几个关键属性)
+    - [许可](#许可)
+    - [几个重要的方法](#几个重要的方法)
+        - [setBlocker() 和 getBlocker()](#setblocker-和-getblocker)
+        - [park()](#park)
+        - [unpark()](#unpark)
+        - [LockSupport 的特性](#locksupport-的特性)
+
+</details>
+<details>
+<summary>深入 AbstractQueuedSynchronizer（JDK 1.8）</summary>
+
+- [深入 AbstractQueuedSynchronizer（JDK 1.8）](#深入-abstractqueuedsynchronizerjdk-18)
+    - [几个重要属性](#几个重要属性)
+    - [Node](#node)
+    - [同步队列](#同步队列)
+        - [入队列](#入队列)
+        - [出队列](#出队列)
+    - [状态](#状态)
+    - [独占模式](#独占模式)
+        - [独占式获取锁](#独占式获取锁)
+            - [独占式不响应中断获取锁](#独占式不响应中断获取锁)
+            - [独占式响应中断获取锁](#独占式响应中断获取锁)
+            - [独占式响应中断和超时获取锁](#独占式响应中断和超时获取锁)
+        - [独占式释放锁](#独占式释放锁)
+    - [共享模式](#共享模式)
+        - [共享式获取锁](#共享式获取锁)
+            - [共享式不响应中断获取锁](#共享式不响应中断获取锁)
+            - [共享式响应中断获取锁](#共享式响应中断获取锁)
+            - [共享式响应中断和超时获取锁](#共享式响应中断和超时获取锁)
+        - [共享式释放锁](#共享式释放锁)
+    - [Condition](#condition)
+        - [Condition 接口](condition-接口)
+        - [ConditionObject](#conditionobject)
+            - [入队、出队操作](#入队出队操作)
+            - [awaitUninterruptibly](#awaituninterruptibly)
+            - [await](#await)
+            - [awaitNanos](#awaitnanos)
+            - [awaitUntil](#awaituntil)
+            - [signal](#signal)
+            - [signalAll](#signalall)
+
+</details>
 
 # 深入 Lock
 除了基于对象监视器锁实现的 `synchronized`，还有基于 `AbstractQueuedSynchronizer` 实现的锁 `Lock`。  
@@ -172,6 +183,8 @@ try {
     lock.unlock();
 }
 ```
+
+<br>[⬆ Back to top](#深入-lock)
 
 # LockSupport（JDK 1.8）
 `LockSupport` 是一个线程阻塞工具类，能够在线程内任意位置让线程阻塞和释放，底层使用 `Unsafe` 实现，我们通常不会直接使用它，而是在锁实现中作为阻塞工具使用。  
@@ -311,6 +324,8 @@ public static void main(String[] args) {
     thread.interrupt();
 }
 ```
+
+<br>[⬆ Back to top](#深入-lock)
 
 # 深入 AbstractQueuedSynchronizer（JDK 1.8）
 AQS（AbstractQueuedSynchronizer）是用来构建锁和同步器（Synchronizer）的框架，它是 J.U.C（java.util.concurrent）的基础，该包下大部分的同步器都是基于这个框架构建的。  
@@ -1669,3 +1684,5 @@ private void doSignalAll(Node first) {
     } while (first != null);
 }
 ```
+
+<br>[⬆ Back to top](#深入-lock)
