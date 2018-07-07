@@ -619,6 +619,133 @@ System.out.println(weakRef);
 
 使用了弱引用，当某个 `ThreadLocal` 没有强引用可达时，就会被下一次 GC 回收掉，这时当 Entry 通过 `get()` 方法来获取 `ThreadLocal` 对象时就会为空，这为 `ThreadLocalMap` 中自身的清理方法提供了便利。  
 
+<br>[⬆ Back to top](#深入-threadlocal)
+
+## 内存泄露问题
+一般认为 `ThreadLocal` 会引起内存泄露是因为如果当前线程的一个 `ThreadLocal` 对象被回收了，但是对于**当前线程 -> 当前线程的 threadLocals -> Entry 数组 -> 某个 entry 的 value** 这样一条强引用链是可达的，所以 value 不会被回收。这种场景一般出现在有线程复用如线程池的场景中，一个线程会存活很长时间，如果对象很大，长期不被回收会影响系统运行效率与安全性。当然如果线程不复用，那么线程肯定不会存活很长时间，用完就销毁也就不存在 `ThreadLocal` 引发的内存泄露问题了。  
+
+因此，在使用 `ThreadLocal` 的过程中，显式的使用 `remove()` 方法进行清理是必要的，虽然 `get()` 方法和 `set()` 方法有很高的几率会执行清理工作，断开 value 的连接。  
+
+## InheritableThreadLocal
+通过 `InheritableThreadLocal` 可以实现父子线程数据共享。  
+
+Thread 类除了 `threadLocals` 外，还有一个 `inheritableThreadLocals`。  
+
+```java
+public class Thread implements Runnable {
+    ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
+}
+```
+
+在线程初始化的时候，会执行 `init()` 方法。  
+
+```java
+private void init(ThreadGroup g, Runnable target, String name,
+                    long stackSize, AccessControlContext acc,
+                    boolean inheritThreadLocals) {
+    if (name == null) {
+        throw new NullPointerException("name cannot be null");
+    }
+
+    this.name = name;
+
+    Thread parent = currentThread();
+    SecurityManager security = System.getSecurityManager();
+    if (g == null) {
+        if (security != null) {
+            g = security.getThreadGroup();
+        }
+        if (g == null) {
+            g = parent.getThreadGroup();
+        }
+    }
+    g.checkAccess();
+
+    if (security != null) {
+        if (isCCLOverridden(getClass())) {
+            security.checkPermission(SUBCLASS_IMPLEMENTATION_PERMISSION);
+        }
+    }
+
+    g.addUnstarted();
+
+    this.group = g;
+    this.daemon = parent.isDaemon();
+    this.priority = parent.getPriority();
+    if (security == null || isCCLOverridden(parent.getClass()))
+        this.contextClassLoader = parent.getContextClassLoader();
+    else
+        this.contextClassLoader = parent.contextClassLoader;
+    this.inheritedAccessControlContext =
+            acc != null ? acc : AccessController.getContext();
+    this.target = target;
+    setPriority(priority);
+    // 当选择继承父线程的 inheritableThreadLocals，并且父线程的 inheritableThreadLocals 不为空时
+    if (inheritThreadLocals && parent.inheritableThreadLocals != null)
+        // 会将父线程的 inheritableThreadLocals 拷贝到子线程中
+        this.inheritableThreadLocals =
+            ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
+
+    this.stackSize = stackSize;
+
+    tid = nextThreadID();
+}
+```
+
+```java
+/**
+* Factory method to create map of inherited thread locals.
+* Designed to be called only from Thread constructor.
+*
+* @param  parentMap the map associated with parent thread
+* @return a map containing the parent's inheritable bindings
+*/
+static ThreadLocalMap createInheritedMap(ThreadLocalMap parentMap) {
+    return new ThreadLocalMap(parentMap);
+}
+
+/**
+* Construct a new map including all Inheritable ThreadLocals
+* from given parent map. Called only by createInheritedMap.
+*
+* @param parentMap the map associated with parent thread.
+*/
+private ThreadLocalMap(ThreadLocalMap parentMap) {
+    Entry[] parentTable = parentMap.table;
+    int len = parentTable.length;
+    // 设置阈值
+    setThreshold(len);
+    // 创建容量为父线程 inheritableThreadLocals 的 table 大小的数组
+    table = new Entry[len];
+
+    for (int j = 0; j < len; j++) {
+        Entry e = parentTable[j];
+        if (e != null) {
+            @SuppressWarnings("unchecked")
+            ThreadLocal<Object> key = (ThreadLocal<Object>) e.get();
+            if (key != null) {
+                // 获取子线程的对应元素的值，需要子类实现，这里默认使用 InheritableThreadLocal 类
+                // 的实现，直接返回父线程中对应元素的值
+                Object value = key.childValue(e.value);
+                // 创建新元素
+                Entry c = new Entry(key, value);
+                // 计算索引
+                int h = key.threadLocalHashCode & (len - 1);
+                // 线性探测法放入元素
+                while (table[h] != null)
+                    h = nextIndex(h, len);
+                table[h] = c;
+                size++;
+            }
+        }
+    }
+}
+```
+
+这里需要注意的一点就是一个线程的 `inheritableThreadLocals` 只在子线程创建的时候会去拷一份父线程的 `inheritableThreadLocals`。如果父线程在子线程创建后再向 `inheritableThreadLocals` 中 set 值，这对子线程来说是不可见的。  
+
+<br>[⬆ Back to top](#深入-threadlocal)
+
 # 参考
 
 > [ThreadLocal源码解读](https://www.cnblogs.com/micrari/p/6790229.html)
