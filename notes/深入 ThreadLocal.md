@@ -6,6 +6,9 @@
         - [set 方法](#set-方法)
         - [get 方法](#get-方法)
         - [remove 方法](#remove-方法)
+    - [为什么要使用弱引用](#为什么要使用弱引用)
+    - [内存泄露问题](#内存泄露问题)
+    - [InheritableThreadLocal](#inheritablethreadlocal)
 
 # 深入 ThreadLocal
 
@@ -546,6 +549,75 @@ private void remove(ThreadLocal<?> key) {
 ```
 
 <br>[⬆ Back to top](#深入-threadlocal)
+
+## 为什么要使用弱引用
+
+```java
+static class Entry extends WeakReference<ThreadLocal<?>> {
+    /** The value associated with this ThreadLocal. */
+    Object value;
+
+    Entry(ThreadLocal<?> k, Object v) {
+        super(k);
+        value = v;
+    }
+}
+```
+
+回顾这个静态内部类，会发现它继承了 `WeakReference`，并将作为 Entry 的 key，也就是 `ThreadLocal` 作为引用传递，构造出一个弱引用。  
+
+那么，为什么要使用弱引用呢？首先我们先看一下弱引用的特点。  
+
+```java
+// 构造一个弱引用对象，传入需要关联的对象
+WeakReference<Object> weakRef = new WeakReference<>(new Object());
+// 获取弱引用关联的对象，不为 null
+System.out.println(weakRef.get());
+// 建议 GC
+System.gc();
+// 会返回 null
+System.out.println(weakRef.get());
+// 弱引用对象没有被 GC 回收，因此需要使用某种手段回收它们，可以使用 ReferenceQueue
+System.out.println(weakRef);
+```
+
+```java
+// 构造一个强引用对象
+Object strongRef = new Object();
+// 构造一个弱引用对象，传入需要关联的对象
+WeakReference<Object> weakRef = new WeakReference<>(strongRef);
+// 获取弱引用关联的对象，不为 null
+System.out.println(weakRef.get());
+// 建议 GC
+System.gc();
+// 由于弱引用关联的对象强可达，所以此处也不为 null
+System.out.println(weakRef.get());
+// 弱引用对象没有被 GC 回收，因此需要使用某种手段回收它们，可以使用 ReferenceQueue
+System.out.println(weakRef);
+```
+
+```java
+// 构造一个强引用对象
+Object strongRef = new Object();
+// 构造一个弱引用对象，传入需要关联的对象
+WeakReference<Object> weakRef = new WeakReference<>(strongRef);
+// 获取弱引用关联的对象，不为 null
+System.out.println(weakRef.get());
+// 将强引用设置为 null
+strongRef = null;
+// 建议 GC
+System.gc();
+// 返回 null
+System.out.println(weakRef.get());
+// 弱引用对象没有被 GC 回收，因此需要使用某种手段回收它们，可以使用 ReferenceQueue
+System.out.println(weakRef);
+```
+
+上面的例子已经很明显的说明了弱引用的特性，即**当 JVM 进行垃圾回收时，无论内存是否足够，都会回收被弱引用关联的对象（这里所说的被弱引用关联的对象是指只有弱引用与之关联，如果存在强引用同时与之关联，则 GC 线程不会回收该对象）**。  
+
+如果这里的 Entry 没有使用弱引用，而是通过 key-value 的形式来定义存储结构，则只要线程没有销毁，Entry 节点就不会销毁，这样线程就与节点强绑定了，在 GC 分析的时候节点也会一直处于强可达的状态，没有办法被回收，而程序本身没有办法判断节点是否可以被清理。  
+
+使用了弱引用，当某个 `ThreadLocal` 没有强引用可达时，就会被下一次 GC 回收掉，这时当 Entry 通过 `get()` 方法来获取 `ThreadLocal` 对象时就会为空，这为 `ThreadLocalMap` 中自身的清理方法提供了便利。  
 
 # 参考
 
