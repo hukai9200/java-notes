@@ -1,4 +1,11 @@
 - [深入 ThreadLocal](#深入-threadlocal)
+    - [实现思路简单分析](#实现思路简单分析)
+    - [ThreadLocalMap 的结构](#threadlocalmap-的结构)
+    - [如何计算索引](#如何计算索引)
+    - [从使用角度分析](#从使用角度分析)
+        - [set 方法](#set-方法)
+        - [get 方法](#get-方法)
+        - [remove 方法](#remove-方法)
 
 # 深入 ThreadLocal
 
@@ -9,8 +16,7 @@
 Thread 类有一个类型为 `ThreadLocal.ThreadLocalMap` 的实例变量 `threadLocals`，也就是说每个线程都有一个自己的 `ThreadLocalMap`。`ThreadLocalMap` 是 `ThreadLocal` 的静态内部类，内部结构有点像 Map，它的 key 可以简单视作 `ThreadLocal`（实际上 key 不是 ThreadLocal 本身，而是它的一个弱引用），value 则为通过代码放入的值。每个线程在往某个 `ThreadLocal` 中放入值的时候，其实都会向自己的 `ThreadLocalMap` 中里存；读取值是通过也是通过某个 `ThreadLocal` 为 key，在自己的 `threadLocals` 里找对应的 value。  
 
 ```java
-public
-class Thread implements Runnable {
+public class Thread implements Runnable {
     
     ThreadLocal.ThreadLocalMap threadLocals = null;
 }
@@ -23,8 +29,7 @@ class Thread implements Runnable {
 static class ThreadLocalMap {
 
     /**
-    * talbe 中存放的元素的类型，可以简单认为就是 ThreadLocalMap
-    * 中存放的元素类型
+    * talbe 中存放的元素的类型
     */
     static class Entry extends WeakReference<ThreadLocal<?>> {
         /** The value associated with this ThreadLocal. */
@@ -98,7 +103,7 @@ public class ThreadLocal<T> {
 }
 ```
 
-`ThreadLocal` 类中有一个 `final` 修饰的成员变量 `threadLocalHashCode`，它在 `ThreadLocal` 被构造时就会生成，它的值是在上一个 `ThreadLocal` 的 `threadLocalHashCode` 值的基础上加上一个魔数 0x61c88647 得到的。这个魔数的选取与斐波那契散列有关，0x61c88647 对应的十进制为 1640531527。斐波那契散列的乘数可以用 (long) ((1L << 31) * (Math.sqrt(5) - 1)) 得到值 2654435769，如果把这个值给转为带符号的 int，则会得到 -1640531527。换句话说  (1L << 32) - (long) ((1L << 31) * (Math.sqrt(5) - 1)) 得到的结果就是 1640531527 也就是 0x61c88647。通过理论与实践（不是我），当我们用 0x61c88647 作为魔数累加为每个 `ThreadLocal` 分配各自的 `threadLocalHashCode`，然后再与 2 的幂取模，得到的结果分布很均匀。  
+`ThreadLocal` 类中有一个 `final` 修饰的成员变量 `threadLocalHashCode`，它在 `ThreadLocal` 被构造时就会生成，它的值是在上一个 `ThreadLocal` 的 `threadLocalHashCode` 值的基础上加上一个魔数 0x61c88647 得到的。这个魔数的选取与斐波那契散列有关，0x61c88647 对应的十进制为 1640531527。斐波那契散列的乘数可以用 (long) ((1L << 31) * (Math.sqrt(5) - 1)) 得到值 2654435769，如果把这个值给转为带符号的整型则是 -1640531527。换句话说，(1L << 32) - (long) ((1L << 31) * (Math.sqrt(5) - 1)) 得到的结果就是 1640531527 也就是 0x61c88647。通过理论与实践（不是我），当我们用 0x61c88647 作为魔数累加为每个 `ThreadLocal` 分配各自的 `threadLocalHashCode`，然后再与 2 的幂取模，得到的结果分布很均匀。  
 
 对于 2 的幂作为模数取模，可以用 &(2^n - 1) 来替代 %2^n，位运算比取模效率高很多。  
 
@@ -149,7 +154,7 @@ ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
     table = new Entry[INITIAL_CAPACITY];
     // 计算索引
     int i = firstKey.threadLocalHashCode & (INITIAL_CAPACITY - 1);
-    // 将入元素
+    // 放入元素
     table[i] = new Entry(firstKey, firstValue);
     size = 1;
     // 计算阈值
