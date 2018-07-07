@@ -191,7 +191,7 @@ private void set(ThreadLocal<?> key, Object value) {
             e.value = value;
             return;
         }
-        // 替换无效的 entry
+        // ThreadLocal 为空，则说明已经无效，需要替换
         if (k == null) {
             replaceStaleEntry(key, value, i);
             return;
@@ -209,7 +209,83 @@ private void set(ThreadLocal<?> key, Object value) {
 
 ```java
 /**
-* 线性探测法计算下一个索引，如果上一个索引为数组中最后一个元素，
+* 替换无效的 Entry
+* 
+* 参数 key 和 value 是需要放入的新的 Entry 的 key 和 value
+* 参数 staleSlot 是发现的无效 Entry 的索引
+*/
+private void replaceStaleEntry(ThreadLocal<?> key, Object value,
+                                int staleSlot) {
+    Entry[] tab = table;
+    int len = tab.length;
+    Entry e;
+
+    int slotToExpunge = staleSlot;
+    // 往前遍历，查找无效的 Entry
+    for (int i = prevIndex(staleSlot, len);
+            (e = tab[i]) != null;
+            i = prevIndex(i, len))
+        // 如果 ThreadLocal 为空，记录索引
+        // 说明除了已经发现的那个，前面还有无效的 Entry
+        if (e.get() == null)
+            slotToExpunge = i;
+
+    // 向后遍历
+    for (int i = nextIndex(staleSlot, len);
+            (e = tab[i]) != null;
+            i = nextIndex(i, len)) {
+        ThreadLocal<?> k = e.get();
+
+        if (k == key) {
+            // 如果 key 一样，则覆盖值
+            e.value = value;
+            // 将无效位置元素与当前位置元素交换，
+            // 之前无效元素所在的位置上放置的是 set 方法新加入的元素
+            tab[i] = tab[staleSlot];
+            tab[staleSlot] = e;
+
+            // 如果只有刚开始发现的那一个无效元素
+            if (slotToExpunge == staleSlot)
+                // 记录无效元素的新位置
+                slotToExpunge = i;
+            // 执行清理
+            cleanSomeSlots(expungeStaleEntry(slotToExpunge), len);
+            // 返回
+            return;
+        }
+
+        // 没有哪个 Entry 的 key 与新加入的元素相同，并且
+        // 找到了刚开始发现的那个无效元素，则再次记录这个无效元素的索引
+        if (k == null && slotToExpunge == staleSlot)
+            slotToExpunge = i;
+    }
+
+    // 执行到这里，说明之前的前序遍历找到了另一个无效的元素
+    // 则将刚开始发现的那个位置的 value 置为空，并将新加入的
+    // 元素赋给它
+    tab[staleSlot].value = null;
+    tab[staleSlot] = new Entry(key, value);
+
+    // 这两个值不相等，说明至少有两个无效的元素
+    if (slotToExpunge != staleSlot)
+        // 清理后来的前序遍历发现的那个无效元素
+        cleanSomeSlots(expungeStaleEntry(slotToExpunge), len);
+}
+```
+
+```java
+/**
+* 计算上一个索引，如果上一个索引为数组中的第一个元素，
+* 则会返回数组最后一个位置的索引
+*/
+private static int prevIndex(int i, int len) {
+    return ((i - 1 >= 0) ? i - 1 : len - 1);
+}
+```
+
+```java
+/**
+* 计算下一个索引，如果上一个索引为数组中最后一个元素，
 * 则会返回 0，因此这就组成了一个环
 */
 private static int nextIndex(int i, int len) {
@@ -362,6 +438,114 @@ private void resize() {
     table = newTab;
 }
 ```
+
+<br>[⬆ Back to top](#深入-threadlocal)
+
+### get 方法
+
+```java
+public T get() {
+    // 当前线程
+    Thread t = Thread.currentThread();
+    // 获取 threadLocals
+    ThreadLocalMap map = getMap(t);
+    if (map != null) {
+        // 将当前 ThreadLocal 实例作为参数传入，获取 Entry
+        ThreadLocalMap.Entry e = map.getEntry(this);
+        if (e != null) {
+            // 返回 Entry 的 value
+            @SuppressWarnings("unchecked")
+            T result = (T)e.value;
+            return result;
+        }
+    }
+    return setInitialValue();
+}
+```
+
+```java
+private Entry getEntry(ThreadLocal<?> key) {
+    // 计算索引
+    int i = key.threadLocalHashCode & (table.length - 1);
+    Entry e = table[i];
+    // 如果找到了，就返回
+    if (e != null && e.get() == key)
+        return e;
+    // 没有找到，使用线性探测法继续查找
+    else
+        return getEntryAfterMiss(key, i, e);
+}
+
+private Entry getEntryAfterMiss(ThreadLocal<?> key, int i, Entry e) {
+    Entry[] tab = table;
+    int len = tab.length;
+
+    while (e != null) {
+        ThreadLocal<?> k = e.get();
+        // 找到了，直接返回
+        if (k == key)
+            return e;
+        // ThreadLocal 为空，则执行全量清理
+        if (k == null)
+            expungeStaleEntry(i);
+        // 线性探测法计算下一个索引
+        else
+            i = nextIndex(i, len);
+        // 获取元素
+        e = tab[i];
+    }
+    return null;
+}
+```
+
+```java
+private T setInitialValue() {
+    // 初始化值，需要子类实现
+    T value = initialValue();
+    Thread t = Thread.currentThread();
+    ThreadLocalMap map = getMap(t);
+    if (map != null)
+        // 设置值
+        map.set(this, value);
+    else
+        // 创建 ThreadLocalMap
+        createMap(t, value);
+    return value;
+}
+```
+
+<br>[⬆ Back to top](#深入-threadlocal)
+
+### remove 方法
+
+```java
+public void remove() {
+    ThreadLocalMap m = getMap(Thread.currentThread());
+    if (m != null)
+        m.remove(this);
+}
+
+private void remove(ThreadLocal<?> key) {
+    Entry[] tab = table;
+    int len = tab.length;
+    // 计算索引
+    int i = key.threadLocalHashCode & (len-1);
+    // 线性探测法找该元素
+    for (Entry e = tab[i];
+            e != null;
+            e = tab[i = nextIndex(i, len)]) {
+        // 找到该元素
+        if (e.get() == key) {
+            e.clear();
+            // 执行全量清理
+            expungeStaleEntry(i);
+            return;
+        }
+    }
+}
+```
+
+<br>[⬆ Back to top](#深入-threadlocal)
 
 # 参考
 
